@@ -23,7 +23,6 @@ def moverotors(rotorlocations):
 
     while increment == False:
 
-
         if result[i] >= 26:
 
             result[i] = 0
@@ -128,14 +127,10 @@ def moveletterthrough(p, rotors, rotorlocations, reflector):
     t = p
     #move the rotors forwards one
 
-
     #pass the letter through the rotors
     for i, loc in enumerate(rotorlocations):
         
-        
         t = passforwards(t, rotors[i], rotorlocations[i])
-
-
 
     #'into the reflector'
     t = throughreflector(t, reflector)
@@ -145,33 +140,9 @@ def moveletterthrough(p, rotors, rotorlocations, reflector):
 
         t = passbackwards(t, rotors[-(i+1)], rotorlocations[-(i+1)])
 
-
     return t
 
 
-
-#apply the enigma machine to a message
-#uses the same system as the early, commercially sold, enigma system
-def early_enigmatise(message, rotor_locations, rotors, reflector):
-
-    cyphertext = ''
-
-    
-
-    for letter in message:
-
-        #move the rotors forwards one place
-        rotor_locations = moverotors(rotor_locations)
-        
-
-
-        #move the letter through the moving plates and the reflector
-        c = moveletterthrough(letter, rotors, rotor_locations, reflector)
-
-        #add the encrypted letter to the end message
-        cyphertext = cyphertext + c
-
-    return cyphertext
 
 #This simulates the plug board used in the military enigmas
 def plug_board(p, pb):
@@ -186,14 +157,12 @@ def plug_board(p, pb):
         elif (len(double) == 1) or (len(double) > 2):
             raise ValueError('One of your plug board settings has the wrong number\nof letters in.')
 
-
         used.append(double[0])
         used.append(double[1])
         
 
     for i, double in enumerate(pb):
 
-        
         #check if the input is the first letter connected
         #to the plug board. If it is switch it to the second
         if p == double[0]:
@@ -208,25 +177,23 @@ def plug_board(p, pb):
 
             break
 
-        
     return p
 
+########################################
+### Enigma machines are defined next ###
+########################################
+
+
 #simulates the 3 rotor enigma system used by the german army and
-#airforce. Used by the navy in the early war.
+#airforce. Used by the navy in the early war. Also sold commercially
 def early_enigmatise(message, rotor_locations, rotors, reflector):
 
     cyphertext = ''
 
-    
-
     for letter in message:
-
-        
 
         #move the rotors forwards one place
         rotor_locations = moverotors(rotor_locations)
-        
-
 
         #move the letter through the moving plates and the reflector
         c = moveletterthrough(letter, rotors, rotor_locations, reflector)
@@ -240,28 +207,17 @@ def high_enigmatise(message, rotor_locations, rotors, reflector, pb):
 
     cyphertext = ''
 
-    
-
     for letter in message:
-
-        
 
         t = plug_board(letter, pb)
 
-
-
         #move the rotors forwards one place
         rotor_locations = moverotors(rotor_locations)
-        
-
 
         #move the letter through the moving plates and the reflector
         c = moveletterthrough(t, rotors, rotor_locations, reflector)
 
-
         c = plug_board(c, pb)
-
-
         
         #add the encrypted letter to the end message
         cyphertext = cyphertext + c
@@ -273,15 +229,9 @@ def late_enigmatise(message, rotor_locations, rotors, reflector, pb, ts):
 
     cyphertext = ''
 
-    
-
     for letter in message:
 
-        
-
         t = plug_board(letter, pb)
-
-
 
         #move the rotors forwards one place
         rotor_locations = moverotors(rotor_locations)
@@ -293,11 +243,8 @@ def late_enigmatise(message, rotor_locations, rotors, reflector, pb, ts):
         #move the letter through the moving plates and the reflector
         c = moveletterthrough(t, rotors, rotor_locations, reflector)
 
-
         c = plug_board(c, pb)
 
-
-        
         #add the encrypted letter to the end message
         cyphertext = cyphertext + c
 
@@ -310,7 +257,7 @@ def late_enigmatise(message, rotor_locations, rotors, reflector, pb, ts):
 #inacurate the nature of enigma means that they should all work
 #https://en.wikipedia.org/wiki/Enigma_rotor_details
 
-
+#rotors used in the standard german military enigma machines
 rotor1 = 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'
 rotor2 = 'AJDKSIRUXBLHWTMCQGZNPYFVOE'
 rotor3 = 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
@@ -319,6 +266,8 @@ rotor5 = 'VZBRGITYUPSDNHLXAWMJQOFECK'
 rotor6 = 'JPGVOUMFYQBENHZRDKASXLICTW'
 rotor7 = 'NZJHGRCXMYSWBOUFAIVLPEKQDT'
 rotor8 = 'FKQHTLXOCBJSPDZRAMEWNIUYGV'
+
+#these are the reflector boards you might use
 ReflectorA = 'EJMZALYXVBWFCRQUONTSPIKHGD'
 ReflectorB = 'YRUHQSLDPXNGOKMIEBFZCWVJAT'
 ReflectorC = 'FVPJIAOYEDRZXWGCTKUQSBNMHL'
@@ -346,9 +295,53 @@ rotor6turns = 'AN'
 rotor7turns = 'AN'
 rotor8turns = 'AN'
 
-ts = [rotor8turns, rotor7turns, rotor5turns]
+
+#choose your rotors. If your using the navy four rotor
+#system then the first rotors need to be beta or gamma
+#for historical accuracy
+rotors = [rotor1, rotor2, rotor3]
+four_rotors = [rotor8, rotor3, rotor5, beta]
+
+#choose your reflector rotor
+reflector = ReflectorA
+
+
+#set the starting locations using a tupple so that
+#it does'nt change because of pointer problems
+start_rotor_locations = (4, 8, 7)
+
+
+plaintext = 'HELLOTHERE'
+
+print('=======================')
+print('===Commercial enigma===')
+print('=======================')
+#This had 3 rotors, a reflector and no plug board.
+#You could choose the starting rotor positions as
+#your key
+
+#encrypt the plain text
+rotor_locations = list(start_rotor_locations)
+cyphertext = early_enigmatise(plaintext, rotor_locations, rotors, reflector)
+
+print(cyphertext)
+
+#decrypt the plain text
+rotor_locations = list(start_rotor_locations)
+decrypted = early_enigmatise(cyphertext, rotor_locations, rotors, reflector)
+    
+print(decrypted)
+print('=======================')
+print('=Basic military enigma=')
+print('=======================')
+#This had 3 rotors and a plug board. Your key
+#would be the rotor positions and which letters
+#were wired to which. There were 10 wires
+
+#setup the plug board
 
 #The plug board had ten wires for connecting
+#these settings are arbitary since they are part of the key
 pb = []
 pb.append('AB')
 pb.append('CD')
@@ -361,61 +354,17 @@ pb.append('OP')
 pb.append('QR')
 pb.append('ST')
 
+#test the plugboard
 p = 'N'
 p = plug_board(p, pb)
-print p
-
-
-#choose your rotors. If your using the navy four rotor
-#system then the first rotors need to be beta or gamma
-#for historical accuracy
-rotors = [rotor1, rotor2, rotor3]
-four_rotors = [rotor8, rotor3, rotor5, beta]
-
-#choose your reflector rotor
-reflector = ReflectorA
-
-
-
-#set the starting locations using a tupple so that
-#it does'nt change because of pointer problems
-start_rotor_locations = (4, 8, 7)
-
-
-plaintext = 'HELLOTHERE'
-
-print '======================='
-print '===Commercial enigma==='
-print '======================='
-#This had 3 rotors, a reflector and no plug board.
-#You could choose the starting rotor positions as
-#your key
-
-#encrypt the plain text
-rotor_locations = list(start_rotor_locations)
-cyphertext = early_enigmatise(plaintext, rotor_locations, rotors, reflector)
-
-print cyphertext
-
-#decrypt the plain text
-rotor_locations = list(start_rotor_locations)
-decrypted = early_enigmatise(cyphertext, rotor_locations, rotors, reflector)
-    
-print decrypted
-print '======================='
-print '=Basic military enigma='
-print '======================='
-#This had 3 rotors and a plug board. Your key
-#would be the rotor positions and which letters
-#were wired to which. There were 10 wires
-
+print(p)
 
 rotor_locations = list(start_rotor_locations)
 
 cyphertext = high_enigmatise(plaintext, rotor_locations, rotors, reflector, pb)
 
 
-print cyphertext
+print(cyphertext)
 
 
 rotor_locations = list(start_rotor_locations)
@@ -423,10 +372,10 @@ rotor_locations = list(start_rotor_locations)
 decrypted = high_enigmatise(cyphertext, rotor_locations, rotors, reflector, pb)
 
 
-print decrypted
-print '======================='
-print '======Navy enigma======'
-print '======================='
+print(decrypted)
+print('=======================')
+print('======Navy enigma======')
+print('=======================')
 #This machine had 4 rotors, a plug board and the
 #notorious double step mechanism. When the rotors
 #moved to a specific step then they would cause the
@@ -434,25 +383,24 @@ print '======================='
 #set the starting locations for the rotors
 four_rotor_starting_locs = (13, 25, 5, 12)
 
+
 #set the rotors and the assosiated double step locations
 rotors = [rotor8, rotor7, rotor5, beta]
 ts = [rotor8turns, rotor7turns, rotor5turns]
-
-
 
 rotor_locations = list(four_rotor_starting_locs)
 
 cyphertext = late_enigmatise(plaintext, rotor_locations, rotors, reflector, pb, ts)
 
 
-print cyphertext
+print(cyphertext)
 
 
 rotor_locations = list(four_rotor_starting_locs)
 
 decrypted = late_enigmatise(cyphertext, rotor_locations, rotors, reflector, pb, ts)
 
-print decrypted
+print(decrypted)
 
 
 
